@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamodb-local
+  labels:
+    app: dynamodb-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dynamodb-local
+  template:
+    metadata:
+      labels:
+        app: dynamodb-local
+    spec:
+      containers:
+      - name: dynamodb-local
+        image: public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:latest
+        ports:
+        - containerPort: 8000
+          name: dynamodb
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dynamodb-local
+  labels:
+    app: dynamodb-local
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: dynamodb
+  selector:
+    app: dynamodb-local
